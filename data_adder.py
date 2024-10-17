@@ -72,6 +72,7 @@ def clean_up(df):
     df = df.drop_duplicates(subset=["post_text"])
     df = df.drop_duplicates(subset=["message_hash"])
     df = df.dropna(subset=["post_text"])
+    df = df[df["post_text"].str.strip() != ""]
     return df
 
 
