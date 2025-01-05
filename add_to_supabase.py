@@ -37,7 +37,7 @@ def create_apartment(row):
 def get_listing_payload(apartment: Apartment):
     listing_payload = {
         "id": apartment.id,
-        "image_uris": apartment.image_uris,
+        "image_uris": apartment.uploaded_image_uris,
         "post_url": apartment.post_url,
         "created_at": apartment.creation_time,
         "size": apartment.size,
@@ -54,6 +54,7 @@ def get_listing_payload(apartment: Apartment):
 def add_to_supabase(row: dict):
     try:
         apartment = create_apartment(row)
+        apartment.set_supabase_image_uris()
         apartment.extract_post_text()
         if not apartment.valid_post:
             return

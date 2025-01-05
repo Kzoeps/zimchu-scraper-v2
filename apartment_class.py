@@ -1,14 +1,9 @@
 import json
 from data_structuroor import get_structured_data
+from image_uploader import upload_images
 
 
 class Apartment:
-    # size: int
-    # rent: int
-    # phone_number: str
-    # location: str
-    # specific_location: str
-    # valid_post: bool = True
 
     def __init__(
         self,
@@ -25,6 +20,7 @@ class Apartment:
         location: str = None,
         specific_location: str = None,
         valid_post: bool = True,
+        uploaded_image_uris: list[str] = [],
     ):
         self.id = id
         self.post_text = post_text
@@ -39,6 +35,7 @@ class Apartment:
         self.location = location
         self.specific_location = specific_location
         self.valid_post = valid_post
+        self.uploaded_image_uris = uploaded_image_uris
 
     def __repr__(self):
         return f"Apartment(id={self.id}, post_text={self.post_text}, image_uris={self.image_uris}, poster_url={self.poster_url}, post_url={self.post_url}, creation_time={self.creation_time}, message_hash={self.message_hash})"
@@ -66,6 +63,16 @@ class Apartment:
         self.location = apartment_info.location
         self.specific_location = apartment_info.specific_location
         return apartment_info
+
+    def set_supabase_image_uris(self):
+        """
+        Method to upload the images of the apartment to the cloud storage.
+        """
+        if self.image_uris:
+            uploaded_uris = upload_images(self.image_uris, self.id)
+            if uploaded_uris:
+                self.uploaded_image_uris = uploaded_uris
+            return uploaded_uris
 
     def to_dict(self):
         """

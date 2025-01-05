@@ -53,7 +53,6 @@ def upload_image(image_uri, path):
                     path=path, file=image, file_options={"content-type": "image/png"}
                 )
                 if response.status_code == 200:
-                    print(response.text())
                     print(f"uploaded image to {path}")
                     return path
                 elif response.status_code == 400:
