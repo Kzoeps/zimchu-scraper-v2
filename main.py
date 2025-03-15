@@ -116,9 +116,10 @@ def feed_response_interceptor(request, response):
                 print("Error parsing response", e)
 
 
-login()
-driver.get(FACEBOOK_GROUP_URL)
-driver.response_interceptor = feed_response_interceptor
+# login()
+# driver.get(FACEBOOK_GROUP_URL)
+driver.get("https://google.com")
+# driver.response_interceptor = feed_response_interceptor
 time.sleep(10)
 
 for _ in range(5):
