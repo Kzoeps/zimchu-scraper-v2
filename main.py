@@ -2,6 +2,7 @@ import os
 import re
 import time
 import json
+import csv
 from random import randint
 
 import seleniumwire.undetected_chromedriver as uc
@@ -12,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from seleniumwire.utils import decode
 
-from extractors import (get_attachments, get_date_of_posting, get_post_id,
+from facebook_response_mappers import (get_attachments, get_date_of_posting, get_post_id,
                          get_post_message, get_post_url, get_poster_url)
 
 # Rent a House in Thimphu Bhutan 91k members group
@@ -54,6 +55,10 @@ driver.get(facebook_url)
 print(f"Facebook opened, waiting for {sleep_time} seconds")
 time.sleep(sleep_time)
 
+# Initialize CSV file
+csv_file = open('scraped-data.csv', mode='w', newline='', encoding='utf-8')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(["post_id", "post_message", "post_url", "poster_url", "attachment_uris", "creation_time"])
 
 def login():
     # LOGIN TO FACEBOOK
@@ -62,9 +67,9 @@ def login():
     password = driver.find_element(By.ID, "pass")
 
     username.send_keys(facebook_username)
-    sleep_time = randint(1, 3)
+    sleep_time = randint(3, 8)
     password.send_keys(facebook_password)
-    sleep_time = randint(1, 3)
+    sleep_time = randint(5, 9)
 
     password.send_keys(Keys.RETURN)
 
@@ -112,14 +117,16 @@ def feed_response_interceptor(request, response):
                                 "creation_time": creation_time,
                             }
                         )
+                        # Write to CSV
+                        csv_writer.writerow([post_id, post_message, post_url, poster_url, attachment_uris, creation_time])
             except Exception as e:
                 print("Error parsing response", e)
 
 
-# login()
-# driver.get(FACEBOOK_GROUP_URL)
-driver.get("https://google.com")
-# driver.response_interceptor = feed_response_interceptor
+login()
+driver.get(FACEBOOK_GROUP_URL)
+# driver.get("https://google.com")
+driver.response_interceptor = feed_response_interceptor
 time.sleep(10)
 
 for _ in range(5):
@@ -128,3 +135,4 @@ for _ in range(5):
 
 
 driver.quit()
+csv_file.close()
