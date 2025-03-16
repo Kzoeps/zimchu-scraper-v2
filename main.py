@@ -55,21 +55,19 @@ driver.get(facebook_url)
 print(f"Facebook opened, waiting for {sleep_time} seconds")
 time.sleep(sleep_time)
 
-# Initialize CSV file
 csv_file = open('scraped-data.csv', mode='w', newline='', encoding='utf-8')
 csv_writer = csv.writer(csv_file)
 csv_writer.writerow(["post_id", "post_message", "post_url", "poster_url", "attachment_uris", "creation_time"])
 
 def login():
-    # LOGIN TO FACEBOOK
     print("logging into facebook")
     username = driver.find_element(By.ID, "email")
     password = driver.find_element(By.ID, "pass")
 
     username.send_keys(facebook_username)
-    sleep_time = randint(3, 8)
+    time.sleep(randint(4, 9))
     password.send_keys(facebook_password)
-    sleep_time = randint(5, 9)
+    time.sleep(randint(3, 7))
 
     password.send_keys(Keys.RETURN)
 
@@ -117,7 +115,6 @@ def feed_response_interceptor(request, response):
                                 "creation_time": creation_time,
                             }
                         )
-                        # Write to CSV
                         csv_writer.writerow([post_id, post_message, post_url, poster_url, attachment_uris, creation_time])
             except Exception as e:
                 print("Error parsing response", e)
@@ -125,13 +122,12 @@ def feed_response_interceptor(request, response):
 
 login()
 driver.get(FACEBOOK_GROUP_URL)
-# driver.get("https://google.com")
 driver.response_interceptor = feed_response_interceptor
 time.sleep(10)
 
-for _ in range(5):
+for _ in range(10):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(randint(3, 8))
+    time.sleep(randint(5, 9))
 
 
 driver.quit()
