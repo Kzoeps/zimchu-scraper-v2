@@ -22,7 +22,8 @@ from facebook_response_mappers import (
     get_poster_url,
 )
 
-from add_to_supabase import read_and_add_to_db
+# from add_to_supabase import read_and_add_to_db
+from scraped_data_saver import add_to_data, save_as_csv
 
 # Rent a House in Thimphu Bhutan 91k members group
 
@@ -133,15 +134,13 @@ def feed_response_interceptor(request, response):
                                 "creation_time": creation_time,
                             }
                         )
-                        csv_writer.writerow(
-                            [
-                                post_id,
-                                post_message,
-                                post_url,
-                                poster_url,
-                                attachment_uris,
-                                creation_time,
-                            ]
+                        add_to_data(
+                            post_id=post_id,
+                            post_message=post_message,
+                            image_uris=attachment_uris,
+                            poster_url=poster_url,
+                            post_url=post_url,
+                            creation_time=creation_time,
                         )
             except Exception as e:
                 print("Error parsing response", e)
@@ -154,9 +153,8 @@ time.sleep(10)
 
 for _ in range(10):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(randint(5, 9))
+    time.sleep(randint(3, 9))
 
 
 driver.quit()
-csv_file.close()
-read_and_add_to_db("scraped-data.csv")
+save_as_csv()

@@ -1,5 +1,4 @@
 import pandas as pd
-from typing import Dict, List
 from hashlib import sha256
 
 from test_extraction import TEST_EXTRACTION
@@ -14,6 +13,7 @@ columns = [
     "message_hash",
 ]
 # Create a DataFrame with columns post_id, post_text, and image_uris
+global df
 df = pd.DataFrame(columns=columns)
 
 # Create an object with the following keys: post_id, post_text, and image_uris all of which are arrays
@@ -41,14 +41,18 @@ def hash_message(message):
 
 
 # Create a function which has three parameters: id, text and uri and appends them to the data object
-def add_to_data(id, text, uri, poster_url, post_url, creation_time):
-    dataContainer["post_id"].append(id)
-    dataContainer["post_text"].append(text)
-    dataContainer["image_uris"].append(uri)
-    dataContainer["poster_url"].append(poster_url)
-    dataContainer["post_url"].append(post_url)
-    dataContainer["creation_time"].append(creation_time)
-    dataContainer["message_hash"].append(hash_message(text))
+def add_to_data(post_id, post_message, image_uris, poster_url, post_url, creation_time):
+    try:
+        dataContainer["post_id"].append(post_id)
+        dataContainer["post_text"].append(post_message)
+        dataContainer["image_uris"].append(image_uris)
+        dataContainer["poster_url"].append(poster_url)
+        dataContainer["post_url"].append(post_url)
+        dataContainer["creation_time"].append(creation_time)
+        dataContainer["message_hash"].append(hash_message(post_message))
+    except Exception as e:
+        print("adding to dataframe failed for post id", post_id)
+        print(e)
 
 
 # create a function to convert data to a dataframe
@@ -62,9 +66,9 @@ def drop_duplicates(df):
 
 
 #  create a function to save the df as csv
-def save_df(df):
+def save_as_csv():
     df = clean_up(df)
-    df.to_csv(f"./scraped-data.csv", index=False)
+    df.to_csv("./scraped-data.csv", index=False)
 
 
 def clean_up(df):
@@ -88,4 +92,4 @@ if __name__ == "__main__":
         )
     df = data_to_df(dataContainer)
     df = clean_up(df)
-    save_df(df)
+    save_as_csv(df)
