@@ -70,3 +70,6 @@ def add_to_supabase(row: dict):
 def read_and_add_to_db(fileName: str):
     scraped_df = read_csv(fileName)
     scraped_df.apply(add_to_supabase, axis=1)
+
+
+read_and_add_to_db("scraped-data.csv")

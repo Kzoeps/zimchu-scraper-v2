@@ -3,7 +3,6 @@ from re import search
 
 from dotenv import load_dotenv
 from openai import LengthFinishReasonError, OpenAI
-from pandas import read_csv
 from pydantic import BaseModel
 from location_formatter import get_standard_location
 from time import sleep
@@ -13,9 +12,6 @@ from prompt_constants import PROMPT
 load_dotenv()
 OPENAI_API_KEY: str = getenv("OPENAI_API_KEY")
 openAiClient = OpenAI(api_key=OPENAI_API_KEY)
-
-SCRAPED_FILE = "./scraped-data.csv"
-scraped_df = read_csv(SCRAPED_FILE)
 
 """
 TODOS:

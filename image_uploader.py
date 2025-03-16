@@ -78,10 +78,15 @@ def get_image_link(uploaded_uri):
 def upload_images(image_uris, post_id):
     image_links = []
     for i, image_uri in enumerate(image_uris):
-        path = get_bucket_path(post_id, i + 2)
-        uploaded_uri = upload_image(image_uri, path)
-        if uploaded_uri:
-            image_links.append(get_image_link(uploaded_uri))
+        try:
+            path = get_bucket_path(post_id, i + 2)
+            uploaded_uri = upload_image(image_uri, path)
+            if uploaded_uri:
+                image_links.append(get_image_link(uploaded_uri))
+        except Exception as e:
+            print("image upload failed")
+            print(e)
+
     return image_links
 
 

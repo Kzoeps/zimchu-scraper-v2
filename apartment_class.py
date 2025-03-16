@@ -1,4 +1,3 @@
-import json
 from data_extractor import get_structured_data
 from image_uploader import upload_images
 
