@@ -37,3 +37,5 @@ POST_ID_SECONDARY = "data.node.post_id"
 FACEBOOK_GROUP_URL = (
     "https://www.facebook.com/groups/1150322371661229?sorting_setting=CHRONOLOGICAL"
 )
+
+SCRAPED_FILE_NAME = "scraped-data.csv"

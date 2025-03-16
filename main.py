@@ -21,8 +21,9 @@ from facebook_response_mappers import (
     get_poster_url,
 )
 
+from add_to_supabase import read_and_add_to_db
 from scraped_data_saver import add_to_data, save_data
-from scrape_constants import FACEBOOK_GROUP_URL
+from scrape_constants import FACEBOOK_GROUP_URL, SCRAPED_FILE_NAME
 from utils import print_demarkers
 
 # Rent a House in Thimphu Bhutan 91k members group
@@ -146,5 +147,8 @@ for _ in range(10):
 print_demarkers("Scraping done")
 
 save_data()
-print_demarkers("saved data to csv")
+print_demarkers(f"saved data to {SCRAPED_FILE_NAME}")
 driver.quit()
+print_demarkers("Adding data to db")
+read_and_add_to_db(SCRAPED_FILE_NAME)
+print_demarkers("Added to db")

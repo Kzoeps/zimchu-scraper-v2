@@ -2,7 +2,7 @@ from supabase_zimchu import supabase
 from pandas import read_csv, isna
 from apartment_class import Apartment
 from pydash import omit_by
-from json import dumps, loads
+from json import loads
 
 
 class Listing:
@@ -59,7 +59,7 @@ def add_to_supabase(row: dict):
         if not apartment.valid_post:
             return
         listing_payload = get_listing_payload(apartment)
-        print("inserting listing:", listing_payload)
+        print("inserting listing with id:", listing_payload.id)
         response = supabase.table("listings_v2").insert(listing_payload).execute()
         print(response)
     except Exception as e:
@@ -70,6 +70,3 @@ def add_to_supabase(row: dict):
 def read_and_add_to_db(fileName: str):
     scraped_df = read_csv(fileName)
     scraped_df.apply(add_to_supabase, axis=1)
-
-
-read_and_add_to_db("scraped-data.csv")

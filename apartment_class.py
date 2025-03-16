@@ -52,8 +52,10 @@ class Apartment:
         print(f"Message Hash: {self.message_hash}")
 
     def extract_post_text(self):
+        print("Extracting structured data from id:", self.id)
         apartment_info = get_structured_data(self.post_text)
         if apartment_info == None:
+            print(f"{self.id} not a valid posting")
             self.valid_post = False
             return None
         self.size = apartment_info.size

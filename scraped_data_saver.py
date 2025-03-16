@@ -2,6 +2,7 @@ import pandas as pd
 from hashlib import sha256
 
 from test_extraction import TEST_EXTRACTION
+from scrape_constants import SCRAPED_FILE_NAME
 
 columns = [
     "post_id",
@@ -67,8 +68,8 @@ def drop_duplicates(df):
 #  create a function to save the df as csv
 def save_as_csv(df):
     df = clean_up(df)
-    df.to_csv("./scraped-data.csv", index=False)
-    print("saved csv files as:", "scraped-data.csv")
+    df.to_csv(f"./{SCRAPED_FILE_NAME}", index=False)
+    print("saved csv files as:", SCRAPED_FILE_NAME)
 
 
 def save_data():
