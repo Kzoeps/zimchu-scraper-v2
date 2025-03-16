@@ -1,16 +1,22 @@
 import pydash
 
-from scrape_constants import (ATTACHMENTS_OG, ATTACHMENTS_SECONDARY,
-                              CREATION_TIME_OG, CREATION_TIME_SECONDARY,
-                              IMAGE_URI_OG, MAIN_ATTACHMENT_PATH, POST_ID_OG,
-                              POST_ID_SECONDARY, POST_MESSAGE_OG,
-                              POST_MESSAGE_SECONDARY, POST_URL_OG,
-                              POST_URL_SECONDARY, POSTER_URL_OG,
-                              POSTER_URL_SECONDARY,
-                              RENT_A_HOUSE_IN_THIMPHU_BHUTAN,
-                              SUBATTACHMENTS_OG)
-
-from test_extraction import TEST_EXTRACTION
+from scrape_constants import (
+    ATTACHMENTS_OG,
+    ATTACHMENTS_SECONDARY,
+    CREATION_TIME_OG,
+    CREATION_TIME_SECONDARY,
+    IMAGE_URI_OG,
+    MAIN_ATTACHMENT_PATH,
+    POST_ID_OG,
+    POST_ID_SECONDARY,
+    POST_MESSAGE_OG,
+    POST_MESSAGE_SECONDARY,
+    POST_URL_OG,
+    POST_URL_SECONDARY,
+    POSTER_URL_OG,
+    POSTER_URL_SECONDARY,
+    SUBATTACHMENTS_OG,
+)
 
 
 def get_metric(data, initial_path, secondary_path):

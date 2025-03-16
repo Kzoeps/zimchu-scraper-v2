@@ -13,7 +13,6 @@ columns = [
     "message_hash",
 ]
 # Create a DataFrame with columns post_id, post_text, and image_uris
-global df
 df = pd.DataFrame(columns=columns)
 
 # Create an object with the following keys: post_id, post_text, and image_uris all of which are arrays
@@ -66,9 +65,15 @@ def drop_duplicates(df):
 
 
 #  create a function to save the df as csv
-def save_as_csv():
+def save_as_csv(df):
     df = clean_up(df)
     df.to_csv("./scraped-data.csv", index=False)
+    print("saved csv files as:", "scraped-data.csv")
+
+
+def save_data():
+    df = data_to_df(dataContainer)
+    save_as_csv(df)
 
 
 def clean_up(df):
@@ -91,5 +96,4 @@ if __name__ == "__main__":
             data["creation_time"],
         )
     df = data_to_df(dataContainer)
-    df = clean_up(df)
     save_as_csv(df)

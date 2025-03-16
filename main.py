@@ -2,10 +2,9 @@ import os
 import re
 import time
 import json
-import csv
-from random import randint
-
 import seleniumwire.undetected_chromedriver as uc
+
+from random import randint
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -22,20 +21,19 @@ from facebook_response_mappers import (
     get_poster_url,
 )
 
-# from add_to_supabase import read_and_add_to_db
-from scraped_data_saver import add_to_data, save_as_csv
+from scraped_data_saver import add_to_data, save_data
+from scrape_constants import FACEBOOK_GROUP_URL
+from utils import print_demarkers
 
 # Rent a House in Thimphu Bhutan 91k members group
 
 sleep_time = randint(1, 10)
-FACEBOOK_GROUP_URL = (
-    "https://www.facebook.com/groups/1150322371661229?sorting_setting=CHRONOLOGICAL"
-)
+
 print("getting env keys")
 load_dotenv()
 facebook_username: str = os.getenv("FACEBOOK_USERNAME")
 facebook_password: str = os.getenv("FACEBOOK_PASSWORD")
-print("env keys set")
+print_demarkers("ENV keys loaded")
 
 
 print("Setting up Chrome Options")
@@ -53,29 +51,17 @@ chrome_options.add_argument("--disable-extensions")
 print("Chrome Options set!")
 
 
-## Create Chrome Driver
+# ## Create Chrome Driver
 print("setting up driver")
 driver = uc.Chrome(options=chrome_options, seleniumwire_options={})
 print("Driver set!")
+print_demarkers("Selenium is ready")
 
 facebook_url = "https://www.facebook.com"
 print("Opening Facebook")
 driver.get(facebook_url)
 print(f"Facebook opened, waiting for {sleep_time} seconds")
 time.sleep(sleep_time)
-
-csv_file = open("scraped-data.csv", mode="w", newline="", encoding="utf-8")
-csv_writer = csv.writer(csv_file)
-csv_writer.writerow(
-    [
-        "post_id",
-        "post_message",
-        "post_url",
-        "poster_url",
-        "attachment_uris",
-        "creation_time",
-    ]
-)
 
 
 def login():
@@ -147,6 +133,8 @@ def feed_response_interceptor(request, response):
 
 
 login()
+print_demarkers("login succsesfull")
+
 driver.get(FACEBOOK_GROUP_URL)
 driver.response_interceptor = feed_response_interceptor
 time.sleep(10)
@@ -155,6 +143,8 @@ for _ in range(10):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(randint(3, 9))
 
+print_demarkers("Scraping done")
 
+save_data()
+print_demarkers("saved data to csv")
 driver.quit()
-save_as_csv()
