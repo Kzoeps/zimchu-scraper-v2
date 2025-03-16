@@ -61,11 +61,12 @@ def add_to_supabase(row: dict):
         listing_payload = get_listing_payload(apartment)
         print("inserting listing:", listing_payload)
         response = supabase.table("listings_v2").insert(listing_payload).execute()
-        print("inserted listing")
+        print(response)
     except Exception as e:
         print("Insertion failed")
         print(e)
 
 
-scraped_df = read_csv("./scarped-failure.csv")
-scraped_df.apply(add_to_supabase, axis=1)
+def read_and_add_to_db(fileName: str):
+    scraped_df = read_csv(fileName)
+    scraped_df.apply(add_to_supabase, axis=1)

@@ -13,8 +13,16 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from seleniumwire.utils import decode
 
-from facebook_response_mappers import (get_attachments, get_date_of_posting, get_post_id,
-                         get_post_message, get_post_url, get_poster_url)
+from facebook_response_mappers import (
+    get_attachments,
+    get_date_of_posting,
+    get_post_id,
+    get_post_message,
+    get_post_url,
+    get_poster_url,
+)
+
+from add_to_supabase import read_and_add_to_db
 
 # Rent a House in Thimphu Bhutan 91k members group
 
@@ -30,7 +38,7 @@ print("env keys set")
 
 
 print("Setting up Chrome Options")
-## Chrome Options
+# Chrome Options
 chrome_options = uc.ChromeOptions()
 chrome_options.add_argument("--ignore-certificate-errors")
 chrome_options.add_argument("--ignore-ssl-errors=yes")
@@ -55,9 +63,19 @@ driver.get(facebook_url)
 print(f"Facebook opened, waiting for {sleep_time} seconds")
 time.sleep(sleep_time)
 
-csv_file = open('scraped-data.csv', mode='w', newline='', encoding='utf-8')
+csv_file = open("scraped-data.csv", mode="w", newline="", encoding="utf-8")
 csv_writer = csv.writer(csv_file)
-csv_writer.writerow(["post_id", "post_message", "post_url", "poster_url", "attachment_uris", "creation_time"])
+csv_writer.writerow(
+    [
+        "post_id",
+        "post_message",
+        "post_url",
+        "poster_url",
+        "attachment_uris",
+        "creation_time",
+    ]
+)
+
 
 def login():
     print("logging into facebook")
@@ -115,7 +133,16 @@ def feed_response_interceptor(request, response):
                                 "creation_time": creation_time,
                             }
                         )
-                        csv_writer.writerow([post_id, post_message, post_url, poster_url, attachment_uris, creation_time])
+                        csv_writer.writerow(
+                            [
+                                post_id,
+                                post_message,
+                                post_url,
+                                poster_url,
+                                attachment_uris,
+                                creation_time,
+                            ]
+                        )
             except Exception as e:
                 print("Error parsing response", e)
 
@@ -132,3 +159,4 @@ for _ in range(10):
 
 driver.quit()
 csv_file.close()
+read_and_add_to_db("scraped-data.csv")
