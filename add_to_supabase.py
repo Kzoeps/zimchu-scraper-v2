@@ -3,6 +3,8 @@ from pandas import read_csv, isna
 from apartment_class import Apartment
 from pydash import omit_by
 from json import loads
+from scrape_constants import SCRAPED_FILE_NAME
+from utils import print_demarkers
 
 
 class Listing:
@@ -54,12 +56,15 @@ def get_listing_payload(apartment: Apartment):
 def add_to_supabase(row: dict):
     try:
         apartment = create_apartment(row)
+        print("\n =========UPLOAD IMAGES=========\n")
         apartment.set_supabase_image_uris()
+        print("\n =========EXTRACT POST TEXT=========\n")
         apartment.extract_post_text()
         if not apartment.valid_post:
             return
         listing_payload = get_listing_payload(apartment)
-        print("inserting listing with id:", listing_payload.id)
+        print("\n =========INSERTING LISTING=========\n")
+        print("inserting listing with id:", listing_payload["id"])
         response = supabase.table("listings_v2").insert(listing_payload).execute()
         print(response)
     except Exception as e:
@@ -70,3 +75,6 @@ def add_to_supabase(row: dict):
 def read_and_add_to_db(fileName: str):
     scraped_df = read_csv(fileName)
     scraped_df.apply(add_to_supabase, axis=1)
+
+if __name__ == "__main__":
+    read_and_add_to_db(SCRAPED_FILE_NAME)

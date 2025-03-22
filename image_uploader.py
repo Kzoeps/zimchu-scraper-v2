@@ -60,6 +60,9 @@ def upload_image(image_uri, path):
                         f"upload failed with status code: {response.status_code}; Error: {response.content}"
                     )
                     return
+                elif response.status_code == 409:
+                    print(f"Image already exists at {path}")
+                    return path
                 else:
                     raise Exception(
                         f"Supabase upload failed with status code: {response.status_code}; Error: {response.content}"
