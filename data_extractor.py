@@ -11,7 +11,7 @@ from prompt_constants import PROMPT
 
 load_dotenv()
 OPENAI_API_KEY: str = getenv("OPENAI_API_KEY")
-openAiClient = OpenAI(api_key=OPENAI_API_KEY)
+openAiClient = OpenAI(api_key=OPENAI_API_KEY, timeout=15)
 
 """
 TODOS:
@@ -89,7 +89,7 @@ def extract_data(data) -> Apartment:
                 print("Too many tokens", e)
             print(f"Parsing fail for: {data}")
             print("Reason:", e)
-            delay = 1.5 * (trial + 1)
+            delay = 1.5 * (trial + 1) + (random.random() * 0.5)
             print(f"Retrying in {delay} seconds")
             sleep(delay)
     return None
