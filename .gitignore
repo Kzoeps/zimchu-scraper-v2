@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+scraper_run_log.txt
+
 # C extensions
 *.so
 
