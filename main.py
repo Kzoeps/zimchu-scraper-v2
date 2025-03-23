@@ -40,6 +40,7 @@ print_demarkers("ENV keys loaded")
 print("Setting up Chrome Options")
 # Chrome Options
 chrome_options = uc.ChromeOptions()
+chrome_options.add_argument("--headless")
 chrome_options.add_argument("--ignore-certificate-errors")
 chrome_options.add_argument("--ignore-ssl-errors=yes")
 chrome_options.add_argument("--allow-insecure-localhost")
