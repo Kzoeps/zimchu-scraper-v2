@@ -1,10 +1,16 @@
+import logging
+import traceback
+
 from supabase_zimchu import supabase
 from pandas import read_csv, isna
 from apartment_class import Apartment
 from pydash import omit_by
 from json import loads
 from scrape_constants import SCRAPED_FILE_NAME
-from utils import print_demarkers
+from utils import print_demarkers, setup_logging
+
+# Set up logger
+logger = setup_logging("zimchu-scraper-supabase")
 
 
 class Listing:
@@ -55,40 +61,72 @@ def get_listing_payload(apartment: Apartment):
 
 def get_existing_listings():
     try:
+        logger.info("Fetching existing listings from Supabase")
         response = supabase.table("listings_v2").select("id").execute()
-        # convert id into in
-        return [d["id"] for d in response.data]
+        listing_ids = [d["id"] for d in response.data]
+        logger.info(f"Found {len(listing_ids)} existing listings")
+        return listing_ids
     except Exception as e:
-        print("Failed to get existing listings")
-        print(e)
+        logger.error("Failed to get existing listings from Supabase")
+        logger.error(f"Error: {str(e)}")
+        logger.error(traceback.format_exc())
         return []
 
 def add_to_supabase(row: dict):
     try:
+        logger.info(f"Processing listing from post ID: {row.get('post_id', 'unknown')}")
         existing_listings = get_existing_listings()
         apartment = create_apartment(row)
+        
         if str(apartment.id) in existing_listings:
-            print(f"Listing with id {apartment.id} already exists")
+            logger.info(f"Listing with id {apartment.id} already exists, skipping")
             return
+            
+        logger.info(f"Uploading images for listing {apartment.id}")
         print("\n =========UPLOAD IMAGES=========\n")
         apartment.set_supabase_image_uris()
+        
+        logger.info(f"Extracting post text for listing {apartment.id}")
         print("\n =========EXTRACT POST TEXT=========\n")
         apartment.extract_post_text()
+        
         if not apartment.valid_post:
+            logger.info(f"Listing {apartment.id} marked as invalid, skipping")
             return
+            
         listing_payload = get_listing_payload(apartment)
+        logger.info(f"Inserting listing into Supabase with ID: {listing_payload['id']}")
         print("\n =========INSERTING LISTING=========\n")
         print("inserting listing with id:", listing_payload["id"])
+        
         response = supabase.table("listings_v2").insert(listing_payload).execute()
+        logger.info(f"Successfully inserted listing {listing_payload['id']}")
+        
+        # Only log detailed response in debug mode
+        logger.debug(f"Supabase response: {response}")
         print(response)
     except Exception as e:
+        logger.error(f"Failed to insert listing: {str(e)}")
+        logger.error(traceback.format_exc())
         print("Insertion failed")
         print(e)
 
 
 def read_and_add_to_db(fileName: str):
-    scraped_df = read_csv(fileName)
-    scraped_df.apply(add_to_supabase, axis=1)
+    try:
+        logger.info(f"Reading data from file: {fileName}")
+        scraped_df = read_csv(fileName)
+        logger.info(f"Found {len(scraped_df)} entries to process")
+        
+        # Process each row and add to Supabase
+        scraped_df.apply(add_to_supabase, axis=1)
+        logger.info("Completed processing all listings")
+    except Exception as e:
+        logger.error(f"Error reading or processing file {fileName}: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
 
 if __name__ == "__main__":
+    logger.info(f"Starting standalone supabase import from {SCRAPED_FILE_NAME}")
     read_and_add_to_db(SCRAPED_FILE_NAME)
+    logger.info("Standalone supabase import completed")
