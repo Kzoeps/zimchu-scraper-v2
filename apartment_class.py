@@ -18,7 +18,7 @@ class Apartment:
         phone_number: str = None,
         location: str = None,
         specific_location: str = None,
-        valid_post: bool = True,
+        valid_post: bool = False,
         uploaded_image_uris: list[str] = [],
     ):
         self.id = id
@@ -58,6 +58,7 @@ class Apartment:
             print(f"{self.id} not a valid posting")
             self.valid_post = False
             return None
+        self.valid_post = True
         self.size = apartment_info.size
         self.rent = apartment_info.rent
         self.phone_number = apartment_info.phone_number

@@ -53,9 +53,23 @@ def get_listing_payload(apartment: Apartment):
     return cleaned_payload
 
 
+def get_existing_listings():
+    try:
+        response = supabase.table("listings_v2").select("id").execute()
+        # convert id into in
+        return [d["id"] for d in response.data]
+    except Exception as e:
+        print("Failed to get existing listings")
+        print(e)
+        return []
+
 def add_to_supabase(row: dict):
     try:
+        existing_listings = get_existing_listings()
         apartment = create_apartment(row)
+        if str(apartment.id) in existing_listings:
+            print(f"Listing with id {apartment.id} already exists")
+            return
         print("\n =========UPLOAD IMAGES=========\n")
         apartment.set_supabase_image_uris()
         print("\n =========EXTRACT POST TEXT=========\n")
