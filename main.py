@@ -34,13 +34,16 @@ print("getting env keys")
 load_dotenv()
 facebook_username: str = os.getenv("FACEBOOK_USERNAME")
 facebook_password: str = os.getenv("FACEBOOK_PASSWORD")
+run_headless: bool = os.getenv("RUN_HEADLESS", False) == "True"
 print_demarkers("ENV keys loaded")
 
 
 print("Setting up Chrome Options")
 # Chrome Options
 chrome_options = uc.ChromeOptions()
-chrome_options.add_argument("--headless")
+if run_headless:
+    print("Running in headless mode")
+    chrome_options.add_argument("--headless")
 chrome_options.add_argument("--ignore-certificate-errors")
 chrome_options.add_argument("--ignore-ssl-errors=yes")
 chrome_options.add_argument("--allow-insecure-localhost")
