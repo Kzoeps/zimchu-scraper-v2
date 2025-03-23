@@ -3,7 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# logs from scraper chron execution
 scraper_run_log.txt
+cleanup_log.txt
 
 # C extensions
 *.so
