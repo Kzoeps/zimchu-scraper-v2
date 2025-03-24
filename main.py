@@ -118,15 +118,50 @@ def login():
             EC.presence_of_element_located((By.CSS_SELECTOR, '[role="banner"]'))
         )
         logger.info("Login successful - banner element found")
+        logger.info("Saving cookies")
+        save_cookies()
     except Exception as e:
         logger.error(f"Login failed: {str(e)}")
         logger.error(traceback.format_exc())
         driver.quit()
         raise
 
+def handle_auth():
+    try:
+        cookies = get_facebook_auth_cookies()
+        if cookies and len(cookies) == 2:
+            logger.info("Adding cookies to browser")
+            driver.add_cookie(cookies[0])
+            driver.add_cookie(cookies[1])
+            driver.refresh()
+            randomsleep = randint(3, 7)
+            logger.info(f"Cookies added successfully, waiting for {randomsleep} seconds")
+            time.sleep(randomsleep)
+            try:
+                logger.info("Waiting for presence of role banner CSS selector (login confirmation)")
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, '[role="banner"]'))
+                )
+                logger.info("Successfully authenticated with cookies")
+            except Exception as e:
+                logger.warning(f"Cookie authentication failed: {str(e)}")
+                logger.info("Falling back to login method")
+                login()
+        else:
+            logger.info("No valid cookies found, proceeding with login")
+            login()
+    except Exception as e:
+        logger.error(f"Error in authentication process: {str(e)}")
+        logger.error(traceback.format_exc())
+        login()  # Fall back to login method
+
 def save_cookies():
-    with open("cookies.json", "w") as f:
-        json.dump(driver.get_cookies(), f)
+    try:
+        with open("cookies.json", "w") as f:
+            json.dump(driver.get_cookies(), f)
+    except Exception as e:
+        logger.error(f"Failed to save cookies: {str(e)}")
+        logger.error(traceback.format_exc())
 
 def load_cookies():
     if not os.path.exists("cookies.json"):
@@ -135,6 +170,33 @@ def load_cookies():
     with open("cookies.json", "r") as f:
         cookie = json.load(f)
         return cookie
+
+def get_facebook_auth_cookies():
+    try:
+        cookies = load_cookies()
+        if not cookies:
+            logger.warning("No cookies found in file")
+            return []
+        cookies_to_add = []
+        for cookie in cookies:
+            if cookie.get("domain") == ".facebook.com":
+                if cookie.get("name") == "c_user" or cookie.get("name") == "xs":
+                    if 'expiry' in cookie:
+                        cookie['expiry'] = int(cookie['expiry'])
+                        # check if cookie has expired
+                        if cookie['expiry'] < time.time():
+                            logger.warning(f"Cookie {cookie['name']} has expired")
+                            return []
+                    
+                    # Log cookie details safely
+                    expiry_info = cookie.get('expiry', 'no expiry date')
+                    logger.info(f"Adding cookie {cookie['name']} with expiry {expiry_info}")
+                    cookies_to_add.append(cookie)
+        return cookies_to_add
+    except Exception as e:
+        logger.error(f"Failed to get Facebook auth cookies: {str(e)}")
+        logger.error(traceback.format_exc())
+        return []
 
 def feed_response_interceptor(request, response):
     if (
@@ -183,8 +245,7 @@ def feed_response_interceptor(request, response):
 
 
 try:
-    login()
-    save_cookies()
+    handle_auth()
     print_demarkers("login successful")
     logger.info(f"Navigating to Facebook group: {FACEBOOK_GROUP_URL}")
     
@@ -214,6 +275,7 @@ print_demarkers("Scraping done")
 logger.info("Facebook scraping completed")
 
 try:
+    print("done done done")
     logger.info("Saving scraped data to file")
     save_data()
     logger.info(f"Data saved successfully to {SCRAPED_FILE_NAME}")
