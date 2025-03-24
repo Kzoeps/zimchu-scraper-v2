@@ -2,7 +2,7 @@ import os
 import re
 import time
 import json
-import logging
+import pickle
 import traceback
 import seleniumwire.undetected_chromedriver as uc
 
@@ -125,6 +125,17 @@ def login():
         driver.quit()
         raise
 
+def save_cookies():
+    with open("cookies.json", "w") as f:
+        pickle.dump(driver.get_cookies(), f)
+
+def load_cookies():
+    if not os.path.exists("cookies.json"):
+        logger.warning("Cookie file not found")
+        return None
+    with open("cookies.json", "r") as f:
+        cookie = json.load(f)
+        return cookie
 
 def feed_response_interceptor(request, response):
     if (
@@ -174,6 +185,7 @@ def feed_response_interceptor(request, response):
 
 try:
     login()
+    save_cookies()
     print_demarkers("login successful")
     logger.info(f"Navigating to Facebook group: {FACEBOOK_GROUP_URL}")
     
