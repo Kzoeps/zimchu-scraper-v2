@@ -2,7 +2,6 @@ import os
 import re
 import time
 import json
-import pickle
 import traceback
 import seleniumwire.undetected_chromedriver as uc
 
@@ -127,7 +126,7 @@ def login():
 
 def save_cookies():
     with open("cookies.json", "w") as f:
-        pickle.dump(driver.get_cookies(), f)
+        json.dump(driver.get_cookies(), f)
 
 def load_cookies():
     if not os.path.exists("cookies.json"):
