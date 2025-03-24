@@ -275,7 +275,6 @@ print_demarkers("Scraping done")
 logger.info("Facebook scraping completed")
 
 try:
-    print("done done done")
     logger.info("Saving scraped data to file")
     save_data()
     logger.info(f"Data saved successfully to {SCRAPED_FILE_NAME}")
