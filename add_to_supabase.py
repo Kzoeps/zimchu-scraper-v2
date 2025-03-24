@@ -41,6 +41,11 @@ def create_apartment(row):
     )
     return apartment
 
+def get_rent(rent: int | None) -> int:
+    if rent is None:
+        return 0
+    # when users list rent as 5.5 it is converted to 5500
+    return rent * 1000 if rent < 10 else rent
 
 def get_listing_payload(apartment: Apartment):
     listing_payload = {
@@ -49,7 +54,7 @@ def get_listing_payload(apartment: Apartment):
         "post_url": apartment.post_url,
         "created_at": apartment.creation_time,
         "size": apartment.size,
-        "rent": apartment.rent,
+        "rent": get_rent(apartment.rent),
         "specific_location": apartment.specific_location,
         "phone_number": apartment.phone_number,
         "location": apartment.location,
