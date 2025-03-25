@@ -51,6 +51,10 @@ print_demarkers("ENV keys loaded")
 
 
 logger.info("Setting up Chrome Options")
+"""
+You can pass version_main argument with your current driver version to your webdriver.
+driver = uc.Chrome(options=options, version_main=106)
+"""
 # Chrome Options
 chrome_options = uc.ChromeOptions()
 if run_headless:
@@ -97,23 +101,25 @@ def login():
     try:
         username = driver.find_element(By.ID, "email")
         password = driver.find_element(By.ID, "pass")
-        
+
         logger.info("Entering username")
         username.send_keys(facebook_username)
         time.sleep(randint(4, 9))
-        
+
         logger.info("Entering password")
         password.send_keys(facebook_password)
         time.sleep(randint(3, 7))
-        
+
         logger.info("Submitting login form")
         password.send_keys(Keys.RETURN)
-        
+
         sleep_time = randint(1, 10)
         logger.info(f"Login form submitted, waiting for {sleep_time} seconds")
         time.sleep(sleep_time)
-        
-        logger.info("Waiting for presence of role banner CSS selector (login confirmation)")
+
+        logger.info(
+            "Waiting for presence of role banner CSS selector (login confirmation)"
+        )
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, '[role="banner"]'))
         )
@@ -126,6 +132,7 @@ def login():
         driver.quit()
         raise
 
+
 def handle_auth():
     try:
         cookies = get_facebook_auth_cookies()
@@ -135,10 +142,14 @@ def handle_auth():
             driver.add_cookie(cookies[1])
             driver.refresh()
             randomsleep = randint(3, 7)
-            logger.info(f"Cookies added successfully, waiting for {randomsleep} seconds")
+            logger.info(
+                f"Cookies added successfully, waiting for {randomsleep} seconds"
+            )
             time.sleep(randomsleep)
             try:
-                logger.info("Waiting for presence of role banner CSS selector (login confirmation)")
+                logger.info(
+                    "Waiting for presence of role banner CSS selector (login confirmation)"
+                )
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, '[role="banner"]'))
                 )
@@ -155,6 +166,7 @@ def handle_auth():
         logger.error(traceback.format_exc())
         login()  # Fall back to login method
 
+
 def save_cookies():
     try:
         with open("cookies.json", "w") as f:
@@ -163,6 +175,7 @@ def save_cookies():
         logger.error(f"Failed to save cookies: {str(e)}")
         logger.error(traceback.format_exc())
 
+
 def load_cookies():
     if not os.path.exists("cookies.json"):
         logger.warning("Cookie file not found")
@@ -170,6 +183,7 @@ def load_cookies():
     with open("cookies.json", "r") as f:
         cookie = json.load(f)
         return cookie
+
 
 def get_facebook_auth_cookies():
     try:
@@ -181,22 +195,25 @@ def get_facebook_auth_cookies():
         for cookie in cookies:
             if cookie.get("domain") == ".facebook.com":
                 if cookie.get("name") == "c_user" or cookie.get("name") == "xs":
-                    if 'expiry' in cookie:
-                        cookie['expiry'] = int(cookie['expiry'])
+                    if "expiry" in cookie:
+                        cookie["expiry"] = int(cookie["expiry"])
                         # check if cookie has expired
-                        if cookie['expiry'] < time.time():
+                        if cookie["expiry"] < time.time():
                             logger.warning(f"Cookie {cookie['name']} has expired")
                             return []
-                    
+
                     # Log cookie details safely
-                    expiry_info = cookie.get('expiry', 'no expiry date')
-                    logger.info(f"Adding cookie {cookie['name']} with expiry {expiry_info}")
+                    expiry_info = cookie.get("expiry", "no expiry date")
+                    logger.info(
+                        f"Adding cookie {cookie['name']} with expiry {expiry_info}"
+                    )
                     cookies_to_add.append(cookie)
         return cookies_to_add
     except Exception as e:
         logger.error(f"Failed to get Facebook auth cookies: {str(e)}")
         logger.error(traceback.format_exc())
         return []
+
 
 def feed_response_interceptor(request, response):
     if (
@@ -221,7 +238,7 @@ def feed_response_interceptor(request, response):
                         poster_url = get_poster_url(json_data)
                         attachment_uris = get_attachments(json_data)
                         creation_time = get_date_of_posting(json_data)
-                        
+
                         # Log the extracted data
                         logger.info(f"Found post: {post_id} from {creation_time}")
                         logger.debug(
@@ -229,7 +246,7 @@ def feed_response_interceptor(request, response):
                             f"Poster={poster_url}, Images={len(attachment_uris)}, "
                             f"CreationTime={creation_time}"
                         )
-                        
+
                         # Add the data to our data structure
                         add_to_data(
                             post_id=post_id,
@@ -248,22 +265,22 @@ try:
     handle_auth()
     print_demarkers("login successful")
     logger.info(f"Navigating to Facebook group: {FACEBOOK_GROUP_URL}")
-    
+
     driver.get(FACEBOOK_GROUP_URL)
     logger.info("Setting up response interceptor")
     driver.response_interceptor = feed_response_interceptor
-    
+
     initial_wait = 10
     logger.info(f"Waiting {initial_wait} seconds for page to load completely")
     time.sleep(initial_wait)
-    
+
     logger.info("Starting page scrolling to load more content")
     for scroll_num in range(10):
         scroll_wait = randint(3, 9)
         logger.info(f"Scroll #{scroll_num+1}/10, waiting {scroll_wait} seconds")
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(scroll_wait)
-    
+
     logger.info("Scrolling completed")
 except Exception as e:
     logger.error(f"Error during Facebook navigation/scrolling: {str(e)}")
@@ -279,17 +296,17 @@ try:
     save_data()
     logger.info(f"Data saved successfully to {SCRAPED_FILE_NAME}")
     print_demarkers(f"saved data to {SCRAPED_FILE_NAME}")
-    
+
     logger.info("Closing browser")
     driver.quit()
     logger.info("Browser closed successfully")
-    
+
     logger.info("Beginning upload to Supabase")
     print_demarkers("Adding data to supabase")
     read_and_add_to_db(SCRAPED_FILE_NAME)
     logger.info("Data successfully added to Supabase")
     print_demarkers("Added to db")
-    
+
     # Log completion with runtime
     end_time = datetime.now()
     run_duration = end_time - start_time
