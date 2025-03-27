@@ -6,6 +6,7 @@ from openai import LengthFinishReasonError, OpenAI
 from pydantic import BaseModel
 from location_formatter import get_standard_location
 from time import sleep
+from random import random
 
 from prompt_constants import PROMPT
 
@@ -85,11 +86,11 @@ def extract_data(data) -> Apartment:
                 print("Refusal:", response.refusal)
                 break
         except Exception as e:
-            if type(e) == LengthFinishReasonError:
+            if type(e) is LengthFinishReasonError:
                 print("Too many tokens", e)
             print(f"Parsing fail for: {data}")
             print("Reason:", e)
-            delay = 1.5 * (trial + 1) + (random.random() * 0.5)
+            delay = 1.5 * (trial + 1) + (random() * 0.5)
             print(f"Retrying in {delay} seconds")
             sleep(delay)
     return None
