@@ -89,7 +89,7 @@ def delete_old_listings(weeks=3):
     response = (
         supabase.table("listings_v2")
         .select("id", "created_at")
-        .eq("user_id", None)
+        .is_("user_id", "null")
         .lt("created_at", cutoff_date)
         .execute()
     )
