@@ -75,7 +75,7 @@ logger.info("Chrome Options set!")
 # ## Create Chrome Driver
 logger.info("Setting up Chrome driver")
 try:
-    driver = uc.Chrome(options=chrome_options, seleniumwire_options={}, version_main=134)
+    driver = uc.Chrome(options=chrome_options, seleniumwire_options={}, version_main=137)
     logger.info("Chrome driver initialized successfully")
     print_demarkers("Selenium is ready")
 except Exception as e:
