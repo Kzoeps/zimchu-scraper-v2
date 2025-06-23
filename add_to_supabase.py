@@ -11,6 +11,7 @@ from utils import setup_logging
 # Set up logger
 logger = setup_logging("zimchu-scraper-supabase")
 existing_listing_ids = []
+new_listings_added = 0
 
 
 class Listing:
@@ -106,6 +107,8 @@ def add_to_supabase(row: dict):
 
         response = supabase.table("listings_v2").insert(listing_payload).execute()
         logger.info(f"Successfully inserted listing {listing_payload['id']}")
+        global new_listings_added
+        new_listings_added += 1
 
         # Only log detailed response in debug mode
         logger.debug(f"Supabase response: {response}")

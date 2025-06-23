@@ -23,7 +23,7 @@ from facebook_response_mappers import (
     get_poster_url,
 )
 
-from add_to_supabase import read_and_add_to_db
+from add_to_supabase import read_and_add_to_db, new_listings_added
 from scraped_data_saver import add_to_data, save_data
 from scrape_constants import FACEBOOK_GROUP_URL, SCRAPED_FILE_NAME
 from utils import print_demarkers, setup_logging
@@ -311,7 +311,9 @@ try:
     end_time = datetime.now()
     run_duration = end_time - start_time
     logger.info(f"=========== ZIMCHU SCRAPER COMPLETED AT {end_time} ===========")
-    logger.info(f"Total runtime: {run_duration}")
+    print("\n=== Cleanup Summary ===")
+    print(f"Total runtime: {run_duration}")
+    print(f"New listings added: {new_listings_added}")
 except Exception as e:
     logger.error(f"Error in final processing steps: {str(e)}")
     logger.error(traceback.format_exc())
