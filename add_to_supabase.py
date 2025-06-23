@@ -42,11 +42,13 @@ def create_apartment(row):
     )
     return apartment
 
+
 def get_rent(rent: int | None) -> int:
     if rent is None:
         return 0
     # when users list rent as 5.5 it is converted to 5500
     return rent * 1000 if rent < 10 else rent
+
 
 def get_listing_payload(apartment: Apartment):
     listing_payload = {
@@ -81,7 +83,7 @@ def get_existing_listings():
 
 def add_to_supabase(row: dict):
     try:
-        logger.info(f"Processing listing from post ID: {row.get('post_id', 'unknown')}")
+        print(f"\n =========LISTING ID {row.get('post_id', 'unknown')}=========\n")
         apartment = create_apartment(row)
 
         if str(apartment.id) in existing_listing_ids:
@@ -89,11 +91,9 @@ def add_to_supabase(row: dict):
             return
 
         logger.info(f"Uploading images for listing {apartment.id}")
-        print("\n =========UPLOAD IMAGES=========\n")
         apartment.set_supabase_image_uris()
 
         logger.info(f"Extracting post text for listing {apartment.id}")
-        print("\n =========EXTRACT POST TEXT=========\n")
         apartment.extract_post_text()
 
         if not apartment.valid_post:
@@ -101,12 +101,10 @@ def add_to_supabase(row: dict):
             return
 
         listing_payload = get_listing_payload(apartment)
-        logger.info(f"Inserting listing into Supabase with ID: {listing_payload['id']}")
-        print("\n =========INSERTING LISTING=========\n")
-        print("inserting listing with id:", listing_payload["id"])
+        logger.info(f"Inserting listing with ID ({listing_payload['id']}) into Supabase.")
 
         response = supabase.table("listings_v2").insert(listing_payload).execute()
-        logger.info(f"Successfully inserted listing {listing_payload['id']}")
+        logger.info(f"Successfully inserted listing with ID: {listing_payload['id']}")
         global new_listings_added
         new_listings_added += 1
 
