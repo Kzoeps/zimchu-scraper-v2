@@ -101,7 +101,9 @@ def add_to_supabase(row: dict):
             return
 
         listing_payload = get_listing_payload(apartment)
-        logger.info(f"Inserting listing with ID ({listing_payload['id']}) into Supabase.")
+        logger.info(
+            f"Inserting listing with ID ({listing_payload['id']}) into Supabase."
+        )
 
         response = supabase.table("listings_v2").insert(listing_payload).execute()
         logger.info(f"Successfully inserted listing with ID: {listing_payload['id']}")
@@ -129,6 +131,9 @@ def read_and_add_to_db(fileName: str):
         # Process each row and add to Supabase
         scraped_df.apply(add_to_supabase, axis=1)
         logger.info("Completed processing all listings")
+        print(
+            f"------------ {new_listings_added} new listings added to Supabase ------------"
+        )
     except Exception as e:
         logger.error(f"Error reading or processing file {fileName}: {str(e)}")
         logger.error(traceback.format_exc())
